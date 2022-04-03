@@ -2,7 +2,7 @@
 clc
 M = zeros(1,500); %% Matris för unika speakers
 classes = {''}
-classes(1,:) = {'speaker 1'}
+classes(1,:) = {'speaker1'}
 A = zeros(1,500); %%Matris med alla talarvektorer
 
 
