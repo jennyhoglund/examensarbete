@@ -9,21 +9,21 @@ clear all;
 
 % digitDatasetPath = 'C:\IoTaP-CoSIS-DISS\Projects\Database\ClassifiedDB\5sec_resized';
 % checkpointPath = 'C:\IoTaP-CoSIS-DISS\Projects\Database\ClassifiedDB\5sec_resized';
-digitDatasetPath = 'C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\amicorpus\individual_headsets\classes';
-checkpointPath = 'C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\amicorpus\individual_headsets\classes';
+digitDatasetPath = 'C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\amicorpus\featureclasses';
+checkpointPath = 'C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\amicorpus\featureclasses';
 
 imds = imageDatastore(digitDatasetPath, ...
     'IncludeSubfolders',true, ...
-    'LabelSource','foldernames');
+    'LabelSource','foldernames')
 
-numTrainFiles = 0.8; 
+numTrainFiles = 0.7; 
 [imdsTrain,imdsValidation] = splitEachLabel(imds,numTrainFiles,'randomize');
 
 %Define Network Architecture
 
 %inputSize = [656 875 3];
 inputSize = [328 438 3];
-numClasses = 4;
+numClasses = 5;
  % layers = [                           
 %     imageInputLayer(inputSize)
 %     convolution2dLayer(5,20)
@@ -45,16 +45,17 @@ layers = [
 %Train Network
 
 options = trainingOptions('sgdm', ...
-    'MaxEpochs',10, ...
+    'MaxEpochs',4, ...
     'ValidationData',imdsValidation, ...
-    'ValidationFrequency',30, ...
+    'ValidationFrequency',10, ...
     'Verbose',false, ...
     'Plots','training-progress',...
     'MiniBatchSize',50, ...
-    'CheckpointPath',checkpointPath)
+    'CheckpointPath',checkpointPath, 'InitialLearnRate',0.001, 'ValidationPatience', 5)
 
-
+tic
 net = trainNetwork(imdsTrain,layers,options);
+toc
 %activations: 
 
 %Test Network
