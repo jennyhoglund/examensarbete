@@ -2,7 +2,6 @@
 clc
 M = zeros(1,500); %% Matris för unika speakers
 classes = {''}
-classes(1,:) = {'speaker1'}
 A = zeros(1,500); %%Matris med alla talarvektorer
 
 
@@ -20,14 +19,14 @@ imds = imageDatastore("C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Mat
 [im, info] = read(imds);
 
 imshow(im)
-[imdsTrain, imdsTest] = splitEachLabel(imds, 0.8);
+
 
 
 
 %%
-while imdsTrain.hasdata
+while imds.hasdata
 
-    [im, info] = read(imdsTrain);
+    [im, info] = read(imds);
     info.Label
 
 
@@ -39,7 +38,7 @@ while imdsTrain.hasdata
         M(1,:) = fv1;
         v = v+1;
 
-        classes(v,:) = {'speaker 1'};
+        classes(v,:) = {'speaker1'};
         A(v,:) = fv1;
 
 
@@ -106,6 +105,10 @@ layers = [
     softmaxLayer
     classificationLayer];
 
-
+tic
 options = trainingOptions('adam');
 net = trainNetwork(A, classes, layers, options);
+toc
+%%
+
+
