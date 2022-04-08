@@ -6,27 +6,31 @@
 %------------------3. resizing 
 
 close all
-clear all
+clearvars
 
 % sample data information
-SampleSec = 5; %every 5 second
-StartSampleSec = 3;  %start time
+SampleSec = 0.5; %every 5 second
+StartSampleSec = 0.4;  %start time
 StepSize = 1000; 
 %Path = 'C:\IoTaP-CoSIS-DISS\Projects\Database\ES2002\';  %dataset path
-Path = 'C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\amicorpus\EN2001a_ind\audio\'
+Path = 'C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\recorded_audio\'
+PathTo = 'C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\mixed\'
 %FileName = 'EN2001b.Headset-0'; 
-FileName = 'EN2001a.Headset-3'
-FileName2write = strcat(FileName,'_filtered');
+FileName = ['recording1']
+FileName2write = 'recording1';
 [signal,fs] = audioread(strcat(Path,FileName,'.wav'));
 %sound(singal,fs)
+
 whos signal
 whos fs
 
 %filtering
-signal = signal(:,1);
-l = length(signal);
-signal = signal(signal > 0.0005 | signal < - 0.0005);
-audiowrite(strcat(Path,FileName2write,'.wav'),signal,fs)
+%%
+
+
+% l = length(signal);
+% signal = signal(signal > 0.0005 | signal < - 0.0005);
+% audiowrite(strcat(Path,FileName2write,'.wav'),signal,fs)
 len = length(signal);
 TotalTime = len./fs;
 dt=1/fs;
@@ -35,57 +39,58 @@ time = 0:dt:TotalTime-dt;
 
 %plot(psd(spectrum.periodogram,signal,'Fs',fs,'NFFT',length(signal)));
 
-%figure;
-%plot(time, signal); xlabel('Seconds'); ylabel('Amplitude');
+% plot(time, signal); xlabel('Seconds'); ylabel('Amplitude');
 
 SampleNums = SampleSec*fs;
 StartSampleNum = StartSampleSec*fs;
 
-maxi = floor(len/StartSampleNum);
+maxi = floor(len/StartSampleNum)/10;
 %Magnitude Scalogram
-figure;
+
+maxi
+imgIndex = 1;
 
 % generate Continuous Wavelet Transform (CWT)
 for i=1:maxi-1
     StartPoint =(i-1)*StartSampleNum+1;
     mtlb = signal(StartPoint:StartPoint+SampleNums);
-    [cfs,frq] = cwt(mtlb,fs,'ExtendSignal',true);
-    tms = (0:numel(mtlb)-1)/fs;
-    surface(tms(:,1:StepSize:end),frq,abs(cfs(:,1:StepSize:end)));
-        saveas(gcf,strcat(Path,FileName2write,'\cwt_',int2str(i),'.jpg'))
+    [cfs,frq] = cwt(mtlb, fs);
 
-    set(gca, 'Visible', 'off')
-    colorbar('off');
-    
-    InSet = get(gca, 'TightInset');
-    set(gca, 'Position', [InSet(1:2), 1-InSet(1)-InSet(3), 1-InSet(2)-InSet(4)]);
-    
-    axis tight
+     tms = (0:numel(mtlb)-1)/fs;
+     surface(tms,frq,abs(cfs))
+     axis tight
     shading flat
-    %xlabel('Time (s)')
-    %ylabel('Frequency (Hz)')
+%     xlabel('Time (s)')
+%     ylabel('Frequency (Hz)')
     set(gca,'yscale','log')
-    
-    saveas(gcf,strcat(Path,FileName2write,'\cwt_',int2str(i),'.jpg'))
-    
-    %Resize the image to make the process faster
-    I = imread(strcat(Path,FileName2write,'\cwt_',int2str(i),'.jpg'));
+    set(gca, 'Visible', 'off')
+    colorbar('off');    
+    InSet = get(gca, 'TightInset');
+     set(gca, 'Position', [InSet(1:2), 1-InSet(1)-InSet(3), 1-InSet(2)-InSet(4)]);
+
+
+   
+  saveas(gcf,strcat("C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\ourrecordings\2022-04-08",'\cwt_',int2str(imgIndex),'.jpg'))
+
+
+    I = imread(strcat("C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\ourrecordings\2022-04-08",'\cwt_',int2str(imgIndex),'.jpg'));
     J = imresize(I, 0.5);
-    imwrite(J,strcat(Path,FileName2write,'\acwt_',int2str(i),'.jpg'));
+    imwrite(J,strcat(strcat("C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\ourrecordings\2022-04-08",'\cwt_',int2str(imgIndex),'.jpg')));
+    imgIndex = imgIndex+1;
 
     i
     maxi
-%     length(cfs)
-%     length(frq)
     
-    clear InSet;
+%     clear InSet;
     clear mtlb;
     clear cfs;
-    clear functions;
-    clear I;
-    clear J;
+%     clear I;
+%     clear J;
 end
 
+%%
+
+%%
     
 % figure
 % subplot(2,1,1)  
