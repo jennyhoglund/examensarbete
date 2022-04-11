@@ -28,9 +28,10 @@ imshow(im)
 while imds.hasdata
 
     [im, info] = read(imds);
-    info.Label
+
     fv1 = encode(bag, im);
     minDist = 0;
+    info.Label
 
     if n == 0
         n = 1;
@@ -48,45 +49,45 @@ while imds.hasdata
                 minDist = dist;
             end
             x = "";
-            if  dist < 0.3 && dist >0.2
+            %if  dist < 0.3 && dist >0.2
+            if dist < 0.3
+                id = i;
+                if dist >0.2
+                    prompt = strcat("Are you speaker ",i, "?" );
+                    x = input(prompt, "s");
+                    if x == "no"
+                        prompt = "Which number of speaker are you? If you are a new speaker, please enter the number ", int2str(i+1);
+                        id = input(prompt);
+                    end
 
-                name = strcat('speaker ', int2str(i))
-                prompt = strcat("Are you ", name, '?');
-                x = input(prompt, "s")
-                minDist = -1;
-            elseif (x == "yes") || (dist <=0.2)
+                end
+                name = strcat('speaker ', int2str(id));
                 M(i,:) = fv1;
                 minDist = -1;
-                name = strcat('speaker ', int2str(i))
-
                 v = v+1;
                 A(v,:) = fv1;
                 classes(v,:) = {name};
             end
-
         end
-    end
-    if minDist >= 0.45
-
-        prompt = ("Are you a new speaker?");
-        x =input(prompt, "s")
-        if x == "yes"
-            n = n + 1;
-            M(n,:) = fv1;
-            v = v+1;
-            name = strcat('speaker ', int2str(n))
-            A(n,:) = fv1;
+        x = 0;
+        if minDist >= 0.5 || minDist ~= -1
+            prompt = ("Are you a new speaker?");
+            x = input(prompt, "s");
+            if (x == "yes")
+                n = n+1;%n är antal speakers
+                id = n;
+            else
+                prompt = "Which number of speaker are you?";
+                id = input(prompt);
+            end
+            M(id,:) = fv1;
+            v = v+1; % v är totala antalet vektorer hittills
+            name = strcat('speaker ', int2str(n));
+            A(v,:) = fv1;
             classes(v,:) = {name};
         end
-
-    elseif minDist ~= -1
-        %user feedback: vem är du?
-        prompt = ("Write which number of speaker you are");
-        x = input(prompt, "s");
-
     end
 end
-
 
 
 whos M
