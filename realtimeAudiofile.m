@@ -4,39 +4,6 @@ close all
 load classifier.mat
 
 
-
-
-%%
-%FÖrst måste vi skapa vektorer för alla bilderna lägga i A matrisen. Sen
-%göra liknande som i preprocessing with vad. Ta
-
-
-% Skapa vektorer för alla bilder i en mapp, lägg till vektorerna i matris,
-% lägg till speaker1 i names. Skapa vektorer för nästa mapp, etc, lägg
-% vektorer i matris, speaker2. Träna nätverk. Nästa steg: använd en mixad
-% ljudström. Förbehandla den så att noise tas bort (alla väldigt höga
-% amplituder sätts till noll. Ta bort blandat tal i audacity. Använd bara
-% rena ljudklipp. När en sådan ljudström har blivit skapad (för de två
-% personerna som klasserna är ifrån), markera tydligt vem som är vem i
-% ljudströmmen, och skapa bilder. Utforma koden så att man vet vilken bild
-% motsvarar vilken tidpunkt. Hur kan man göra det? Något som liknar
-% preprocessing with VAD, en whileloop som går igenom en ljudfil, varje
-% gång som 1 sekund har gått, skapar den en ljudbild. Lite grann som jag
-% tänkte göra igår. Den kan ockå spela upp ljudklippet (och vara pausat)
-% för den sekunden som den skapar bilden för. Slutligen, utvärdera bilden.
-% (sätt först dess sanna klass till vilken den ska vara). Hur vet man vad
-% den ska vara? Om man lablar ljudströmmen med hjälp av matlab. Hur
-% använder man labels i matlab? Det verkar ganska enkelt. Man labelar den
-% som vanligt, exporterar labelfil, skapar en audiodatastore med label till
-% den labelfilen.
-% Utvinn vektorer för den, och mata in i nätverket. Utvärdera genom att
-% jämföra predictions med true label.
-
-
-
-
-
-
 audioIn = audioread("C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\IS1009a-3filter.wav");
 VAD = voiceActivityDetector;
 fileReader = dsp.AudioFileReader("C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\IS1009a-3filter.wav");
