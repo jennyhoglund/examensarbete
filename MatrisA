@@ -1,38 +1,25 @@
 clc
 clearvars
-load bag.mat
+load classifier.mat
 tic;
-M = zeros(1,500); %% Matris för unika speakers
-classes = {''}
+classes = [''];
 %classes(1,:) = {'speaker1'}
 A = zeros(1,500); %%Matris med alla talarvektorer
 i = 1;
 n = 0; %% antal unika talare
 v = 0; %% antal vektorer
-imds = imageDatastore("C:\Users\hebam\Desktop\Examensarbete\Code_MATLAB\amicorpus\IS1009features", ...
+imds = imageDatastore("C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\nyaAmiCorpus\filtered\bilder", ...
     'IncludeSubfolders',true, ...
     'LabelSource','foldernames');
 
-[im, info] = read(imds);
-
-imshow(im)
-imindex=0;
 while imds.hasdata
 
     [im, info] = read(imds);
-imindex=imindex+1
     fv1 = encode(bag, im);
-    minDist = 0;
-    info.Label
-        M(1,:) = fv1;
-        v = v+1;
-          A(v,:) = fv1;
-        if v<86
-        classes(v,:) = {'speaker1'};
-        A(v,:) = fv1;
-        else 
-           classes(v,:) = {'speaker2'};  
+    s = string(info.Label)
+    v = v+1;
+    A(v,:) = fv1;
+    classes(v,:) = s;
 
-        end
-    end
-
+end
+classes = cellstr(classes);
