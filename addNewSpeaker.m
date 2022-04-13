@@ -12,14 +12,16 @@ load bag.mat
 
 path = '';
 i = 1;
-n = 0; %% antal unika talare
+n = 0; %% antal un1ika talare
 v = 0; %% antal vektorer
-imds = imageDatastore("C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\ourrecordings", ...
-    'IncludeSubfolders',true, ...
-    'LabelSource','foldernames');
+% imds = imageDatastore("C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\ourrecordings", ...
+%     'IncludeSubfolders',true, ...
+%     'LabelSource','foldernames');
+imds = imageDatastore("C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\ourrecordings\mySpeech\", 'LabelSource','none');
 [im, info] = read(imds);
 
-imshow(im)
+imIndex = 1;
+
 
 
 
@@ -28,8 +30,9 @@ imshow(im)
 while imds.hasdata
 
     [im, info] = read(imds);
-
+    
     fv1 = encode(bag, im);
+    imIndex = imIndex +1
     minDist = 0;
     info.Label
 
@@ -53,7 +56,7 @@ while imds.hasdata
             if dist < 0.3
                 id = i;
                 if dist >0.2
-                    prompt = strcat("Are you speaker ",i, "?" );
+                    prompt = strcat("Are you speaker ",int2str(i), "?" );
                     x = input(prompt, "s");
                     if x == "no"
                         prompt = "Which number of speaker are you? If you are a new speaker, please enter the number ", int2str(i+1);
@@ -77,8 +80,8 @@ while imds.hasdata
                 n = n+1;%n är antal speakers
                 id = n;
             else
-                prompt = "Which number of speaker are you?";
-                id = input(prompt);
+        %        prompt = "Which number of speaker are you?";
+        %        id = input(prompt);
             end
             M(id,:) = fv1;
             v = v+1; % v är totala antalet vektorer hittills
@@ -88,6 +91,8 @@ while imds.hasdata
         end
     end
 end
+
+
 
 
 whos M
@@ -124,3 +129,6 @@ toc
 %%
 
 
+
+
+%%
