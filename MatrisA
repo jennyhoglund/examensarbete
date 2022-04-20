@@ -1,19 +1,20 @@
+%% Skapa A matris och vektor med klasser
+
 clc
 clearvars
-load classifier.mat
+load classifierTvåklasser.mat
 tic;
 classes = [''];
-%classes(1,:) = {'speaker1'}
+
 A = zeros(1,500); %%Matris med alla talarvektorer
 i = 1;
 n = 0; %% antal unika talare
 v = 0; %% antal vektorer
-imds = imageDatastore("C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\nyaAmiCorpus\filtered\bilder", ...
+imds = imageDatastore("C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\nyaAmiCorpus\filtered\0.5sec\trainimages\", ...
     'IncludeSubfolders',true, ...
     'LabelSource','foldernames');
 
 while imds.hasdata
-
     [im, info] = read(imds);
     fv1 = encode(bag, im);
     s = string(info.Label)
@@ -23,3 +24,39 @@ while imds.hasdata
 
 end
 classes = cellstr(classes);
+%%
+% Skapa ecoc modell.
+mdl = fitcecoc(A, classes);
+CVmdl = crossval(mdl)
+genError = kfoldLoss(CVmdl)
+mdlinc = incrementalLearner(mdl)
+% MdlEarly = incrementalClassificationECOC(MaxNumClasses=5);
+
+
+%%
+classes = categorical(classes);
+numObservations = size(classes,1)
+numObservationsTrain = floor(0.7*numObservations)
+numObservationsValidation = floor(0.15*numObservations)
+numObservationsTest = numObservations - numObservationsTrain - numObservationsValidation
+
+idx = randperm(numObservations);
+idxTrain = idx(1:numObservationsTrain);
+idxValidation = idx(numObservationsTrain+1:numObservationsTrain+numObservationsValidation);
+idxTest = idx(numObservationsTrain+numObservationsValidation+1:end);
+
+tblTrain = A(idxTrain,:);
+tblValidation = A(idxValidation,:);
+tblTest = A(idxTest,:);
+
+layers = [
+    featureInputLayer(500)
+    batchNormalizationLayer
+    reluLayer
+    fullyConnectedLayer(3)
+    softmaxLayer
+    classificationLayer];
+
+tic
+options = trainingOptions('adam');
+net = trainNetwork(A, classes, layers, options);
