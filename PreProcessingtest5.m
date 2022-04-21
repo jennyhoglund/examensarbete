@@ -37,6 +37,7 @@ m=mean(abs(audioIn));
  figure 
  plot(t,audioIn) 
 %%
+%Koden for att filtera höga spikar
  for i=1:numel(filteredsignal)-2
      if abs(filteredsignal(i)) > 0.5
          filteredsignal(i)=0 ;
