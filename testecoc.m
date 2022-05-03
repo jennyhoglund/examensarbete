@@ -3,8 +3,7 @@ clc
 close all
 load Amatrix3sec.mat
 
-i = 1;
-StepSize = 100;
+
 predictions ={''};
 A = single(A);
 mdl = fitcecoc(A, classes);
@@ -16,6 +15,7 @@ imdsTest = imageDatastore("C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete
 imdsTest = shuffle(imdsTest)
 maxscrs = zeros(1,1);
 truelabels = {''}
+i = 1;
 
 while imdsTest.hasdata
 
