@@ -2,7 +2,7 @@ function [A,classes] = CreateMatrix (path)
 load classifierTvåklasser.mat
 load bag
 tic;
-classes = [''];
+classes = {''};
 
 A = zeros(1,500); %%Matris med alla talarvektorer
 i = 1;
@@ -18,10 +18,8 @@ while imds.hasdata
     s = string(info.Label)
     v = v+1;
     A(v,:) = fv1;
-    classes(v,:) = s;
+    classes(v,:) = cellstr(s);
 
 end
-
-classes = cellstr(classes);
 
 end
