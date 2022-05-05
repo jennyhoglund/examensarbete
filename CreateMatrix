@@ -1,0 +1,27 @@
+function [A,classes] = CreateMatrix (path)
+load classifierTvåklasser.mat
+load bag
+tic;
+classes = [''];
+
+A = zeros(1,500); %%Matris med alla talarvektorer
+i = 1;
+n = 0; %% antal unika talare
+v = 0; %% antal vektorer
+imds = imageDatastore(path, ...
+    'IncludeSubfolders',true, ...
+    'LabelSource','foldernames');
+
+while imds.hasdata
+    [im, info] = read(imds);
+    fv1 = encode(bag, im);
+    s = string(info.Label)
+    v = v+1;
+    A(v,:) = fv1;
+    classes(v,:) = s;
+
+end
+
+classes = cellstr(classes);
+
+end
