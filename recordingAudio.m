@@ -1,93 +1,69 @@
-clc
-clearvars 
-clc
+% ---------------- Preprocessing -----------------------------
+% ---------------- 1. fitering 
+%------------------2. image generation 
+%------------------3. resizing 
+
+close all
 clearvars
+fs=16000;
 
-
-recObj = audiorecorder(16000, 8, 1)
-
-disp('Start speaking.')
-recordblocking(recObj, 60);
-disp('End of Recording.');
-play(recObj);
-y = getaudiodata(recObj);['' ...
-    ]
-
-%sample rate är 8000Hz
-
-%%
-fs = 16000;
-y = y(:,1);
-
-l = length(y);
-y = y(y > 0.0005 | y < - 0.0005);
-% audiowrite(strcat(Path,FileName2write,'.wav'),signal,fs)
-len = length(y);
-TotalTime = len./fs;
-dt=1/fs;
-%time1 = 0:dt:(len*dt)-dt;
-time = 0:dt:TotalTime-dt;
-%sound(y, fs)
-
-%%
-SampleSec = 5; %every 2 second
-StartSampleSec =1;  %start time
-StepSize = 1000;
-SampleNums = SampleSec*fs;
-StartSampleNum = StartSampleSec*fs;
-maxi = floor(len/StartSampleNum);
-plot(y)
-%%
-audiowrite(strcat('C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\ourrecordings\recording1','.wav'),y,fs)
-
-%%
-
-i = 1;
-close all;
-
-StartPoint =16000;
-PathTo = 'C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\ourrecordings\';
-FileName = '2022-04-05'
-if len >= SampleNums
-    for i=1:maxi-1
-        StartPoint =(i-1)*StartSampleNum+1;
-        mtlb = y(StartPoint:StartPoint+SampleNums);
-        [cfs,frq] = cwt(mtlb,fs,'ExtendSignal',true);
-        tms = (0:numel(mtlb)-1)/fs;
+PathTo= 'C:\Users\hebam\Desktop\Examensarbete\AMI-corpus\3s signal\Test';
+VAD = voiceActivityDetector;
+deviceReader = audioDeviceReader(44100,256);
+setup(deviceReader)
+fileWriter = dsp.AudioFileWriter('22.wav','FileFormat','WAV');
+VAD = voiceActivityDetector;
+imindex = 1;
+samplesPerFrame=256;
+oneSecond = zeros(samplesPerFrame,1);
+StepSize = 100;
+disp('Speak into microphone now.')
+tic
+i=1;
+totoverrun=0;
+while toc < 10
+    [acquiredAudio, numoverrun] = deviceReader();
+    
+    probability = VAD(acquiredAudio);
+    if probability >0.95
+    fileWriter(acquiredAudio);
+    oneSecond(i:i+samplesPerFrame - 1,:) = acquiredAudio;
+    totoverrun=totoverrun+numoverrun;
+    end
+    i = i +samplesPerFrame - 1;
+    
+    if (i >= 44100)
+       tic
+     [cfs,frq] = cwt(oneSecond,fs);
+        tms = (0:numel(oneSecond)-1)/fs;
         surface(tms(:,1:StepSize:end),frq,abs(cfs(:,1:StepSize:end)));
-        saveas(gcf,strcat(PathTo,FileName,'\cwt_',int2str(i),'.jpg'))
 
         set(gca, 'Visible', 'off')
         colorbar('off');
-
         InSet = get(gca, 'TightInset');
         set(gca, 'Position', [InSet(1:2), 1-InSet(1)-InSet(3), 1-InSet(2)-InSet(4)]);
-
         axis tight
         shading flat
-        %xlabel('Time (s)')
-        %ylabel('Frequency (Hz)')
         set(gca,'yscale','log')
-        im = frame2im(getframe(gcf));
-        im = imresize(im, 0.5);
-        shading flat
-        
-
-        imwrite(im,strcat(PathTo,FileName, '\cwt_',int2str(i),'.jpg'));
-
-
-        %saveas(gcf,strcat(PathTo,FileName,'\cwt_',int2str(i),'.jpg'))
+       saveas(gcf,strcat(PathTo,'\cwt_',int2str(imindex),'.jpg'))
 
         %Resize the image to make the process faster
-        % I = imread(strcat(PathTo,FileName,'\cwt_',int2str(i),'.jpg'));
-        %J = imresize(I, 0.5);
-        %imwrite(J,strcat(PathTo,FileName, '\cwt_',int2str(i),'.jpg'));
-        %
+       I = imread(strcat(PathTo,'\cwt_',int2str(imindex),'.jpg'));
+        J = imresize(I, 0.5);
+       imwrite(J,strcat(PathTo,'\cwt_',int2str(imindex),'.jpg'));
+        close all
+        imindex= imindex+1;
+
+        oneSecond = zeros(samplesPerFrame,1);
+        i = 1;
+        clear I 
+        clear J
+        totoverrun
+        toc
+  
     end
-else
-    disp('no sound')
 end
+disp('Recording complete.')
+release(deviceReader)
+release(fileWriter)
 
-
-
-%%
