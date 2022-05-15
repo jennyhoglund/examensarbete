@@ -1,0 +1,43 @@
+close all
+clear all
+load pp.mat
+pr= unique(predictions);
+[truelabels]=asksp(pr)
+function [truelabels]= asksp(pr)
+personid = 0;
+%speakers=speakerid(3)
+
+% t=tic;
+% while true
+%     choice = menu('Are you a new speaker?',"Yes","No");
+%     if choice==1
+%         a=1;
+%     elseif choice==2
+i=0;
+while (true)
+
+    options=pr(1:end);
+    
+    choice = menu('Who is speaking?',options);
+    if choice==1
+        personid = '1';
+       
+    elseif choice==2
+        personid = '2';
+    elseif choice==3
+        personid = '3';
+    elseif choice==4
+        dlgtitle='Input'
+       answer = inputdlg('Enter the name', dlgtitle);
+       pr(end+1,1)= answer
+    
+    else
+      break;
+    end
+    pause(0.2)
+    i=i+1;
+    truelabels(i,:) = personid;
+
+
+end
+end
