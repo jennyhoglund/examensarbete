@@ -1,13 +1,9 @@
 clearvars
 clc
 close all
-load net3sec.mat
-
-
-
-
+load net3sec4classes.mat
 nbrOfSpeakers = 0;
-imdsTest = imageDatastore("C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\nyaAmiCorpus\filtered\3sec\mix", "LabelSource","foldernames", IncludeSubfolders=true);
+imdsTest = imageDatastore("C:\Users\hebam\Desktop\Examensarbete\AMI-corpus\10_klasser\mix", "LabelSource","foldernames", IncludeSubfolders=true);
 maxscrs = zeros(100,1);
 truelabels = {''}
 predictions ={''};
@@ -26,17 +22,49 @@ while imdsTest.hasdata
     pred = predict(net, im)
     truelabels(i,:) = cellstr(info.Label)
     maxscrs(i,:) = max(pred);
-    if max(pred) == 1
-        idx = find(pred==1)
+%     if max(pred) == 1
+%         idx = find(pred==1)
+%         class = classNames(idx)
+%         predictions(i,:) = cellstr(class);
+%         
+%     else
+%         predictions(i,:) = cellstr(info.Label)
+% 
+%     end
+  idx = find(max(pred))
         class = classNames(idx)
         predictions(i,:) = cellstr(class);
-        
-    else
-        predictions(i,:) = cellstr(info.Label)
+        personid = 0;
+k=0;
+ speaker= string(class);
 
+    personid=speaker;
+
+    choice = menu('Are you speaker'+ speaker,'YES','NO');
+    if choice==2
+        idxfornames=length(classNames);
+
+
+        options=[classNames;'newspeaker'];
+
+        choice = menu('Who is speaking?',options);
+        if choice==(idxfornames+1)
+            dlgtitle='Input'
+            answer = inputdlg('Enter the name', dlgtitle);
+            classNames(end+1,1)= answer;
+            personid=answer;
+        else
+            personid=string(classNames(choice));
+            pause(0.2)
+        end
     end
+    k=k+1;
+    truelabels(k,:) = cellstr(personid)
+
+
 i = i+1;
 end
+
 
 %%
 predictions = string(predictions)
@@ -70,4 +98,3 @@ net = trainNetwork(imdstrain,layers,options)
 % accuracy = mean(ypred == imdsValidation.Labels)
 toc
 end
-
