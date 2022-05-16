@@ -1,14 +1,13 @@
-
 clc
 clearvars
 
-maintbl = readtable("C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\nyaAmiCorpus\lapelmixes\excelfiler\es2011a-A");
-tbl0 = readtable("C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\nyaAmiCorpus\lapelmixes\excelfiler\es2011a-B");
-tbl2 = readtable("C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\nyaAmiCorpus\lapelmixes\excelfiler\es2011a-C");
-tbl3 = readtable("C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\nyaAmiCorpus\lapelmixes\excelfiler\es2011a-D");
+tbl0 = readtable("C:\Users\hebam\Desktop\Examensarbete\xls files\ES2003B.0.xls");
+ maintbl = readtable("C:\Users\hebam\Desktop\Examensarbete\xls files\ES2003B.1.xls");
+tbl2 = readtable("C:\Users\hebam\Desktop\Examensarbete\xls files\ES2003B.2.xls");
+tbl3 = readtable("C:\Users\hebam\Desktop\Examensarbete\xls files\ES2003B.3.xls");
 
-audioPath ="C:\Users\jenny\OneDrive\Documents\Skola\Examensarbete\Material\nyaAmiCorpus\lapelmixes\ljud"
-audiomixfile = "ES2011a";
+audioPath ="C:\Users\hebam\Desktop\Examensarbete\AMI-corpus\10_klasser"
+audiomixfile = "ES2003b.Mix-Lapel";
 [y, fs] = audioread(strcat(audioPath, "\",audiomixfile, ".wav"));
 
 temp1 = [300 350 ; 350 370];
@@ -27,16 +26,25 @@ filtertable(maintbl,audioPath,audiomixfile);
 
 function newtbl = removeOverlapLoop(maintbl, tbl1, i)
 start = maintbl.start(i);
+start2=0;
 en = maintbl.xEnd(i);
 en2 = 0;
 j = 1;
-while en2 <= en && j < height(tbl1)
+while j <= height(tbl1)
 
     start2 = tbl1.start(j);
     en2 = tbl1.xEnd(j);
     %j = j+1
-    if start2 >start && en2 < en
+    if start2 >start && en2 <= en
         disp('segment1 -segment2- segment1')
+        i
+        tbl1.x_who(j)
+        start2
+        en2
+        start
+        en
+        j
+        height(tbl1)
         if (start2 - start) > (en - en2)
             en = start2;
             maintbl.xEnd(i) = en;
@@ -48,21 +56,23 @@ while en2 <= en && j < height(tbl1)
             %  temp1(i,1) = start
 
         end
-
-    elseif start2 == start
-        disp('start at the same time')
-        maintbl.xEnd(i) = maintbl.start(i);
-        %  temp1(i,2) = temp1(i,1)
+       
+% 
+%     elseif start2 == start
+%         disp('start at the same time')
+%         maintbl.xEnd(i) = maintbl.start(i);
+%         %  temp1(i,2) = temp1(i,1)
 
     elseif en2 > start && en2 < en
         disp('start1 < en2 < en')
         start = en2;
         maintbl.start(i) = start;
 
-    elseif start2 < start && en2>en
+    elseif start2 <= start && en2>en
         disp('segment2 -segment1- segment2')
         en = start;
         maintbl.xEnd(i) = en;
+       
 
     elseif start2 > start  && start2 < en
         disp(['start1 < start2 < en1'])
@@ -109,15 +119,15 @@ totaltime = 0;
 
 
 for i=1:height(maintbl)
-    start=floor(fs*maintbl.start(i))
+    start=floor(fs*maintbl.start(i));
     endd=floor( fs*maintbl.xEnd(i));
     x = audio(start:endd-1);
     a = endd-start;
-    totaltime = totaltime+a/fs
+    totaltime = totaltime+a/fs;
     onesec(lastend:lastend+a-1)=x;
     lastend=lastend+ a+1;
 
 end
 
-audiowrite(strcat(audioPath, "\",audiomixfile, "_filtered.wav"),onesec,fs);
+audiowrite(strcat(audioPath, "\","ES2003B.1", "_filtered.wav"),onesec,fs);
 end
