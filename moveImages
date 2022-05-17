@@ -1,0 +1,15 @@
+path= 'C:\Users\hebam\Desktop\Examensarbete\AMI-corpus\10_klasser\XMLaudiofiles\3sec\8';
+pathto='C:\Users\hebam\Desktop\Examensarbete\AMI-corpus\10_klasser\XMLaudiofiles\3sec\t8';
+
+
+   
+
+x=length(dir(path))-2;
+train=floor(0.8*300);
+test=x-train;
+ rn=randsample(x,test);
+for i=1:length(rn)
+f=strcat(path,'\cwt_',int2str(rn(i)),'.jpg');
+ movefile(f,pathto,'f')
+end
+
